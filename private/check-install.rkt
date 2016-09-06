@@ -1,0 +1,126 @@
+#lang racket/base
+
+;; Check that the user's system is ready to use this Mutt API
+
+(provide pre-installer)
+
+(require
+  setup/cross-system
+  (only-in racket/system system)
+)
+
+;; =============================================================================
+
+(define errloc 'mutt:pre-install)
+
+(define (pre-installer collections-top-path racl-path)
+  (check-system-type)
+  (check-mutt)
+  (check-mail)
+  (check-muttrc)
+  (void))
+
+;; 2016-09-06: Windows isn't supported because Windows isn't tested.
+(define (check-system-type)
+  (when (eq? (cross-system-type 'os) 'windows)
+    (raise-user-error errloc "this Racket mutt client does not yet support Windows")))
+
+;; Check for `mutt` executable,
+;;  raise error if it's not found
+(define (check-mutt)
+  (unless (system "type mutt >& /dev/null")
+    (raise-user-error errloc "could not locate `mutt` executable, install with your package manager and try again")))
+
+;; Check for a mailbox folder
+;;  and other config folders/files
+(define (check-mail)
+  (define home (find-system-path 'home-dir))
+  (define home/.mail (build-path home ".mail"))
+  (unless (directory-exists? home/.mail)
+    (define response (bool-prompt "Directory ~a does not exist. Create it? [y/n]" home/.mail))
+    (unless (or (eof-object? response) (not response))
+      (make-directory home/.mail)))
+  (void))
+
+;; Check if `.muttrc` exists,
+;;  if not, help user create one
+(define (check-muttrc)
+  (define home (find-system-path 'home-dir))
+  (define home/.muttrc (build-path home ".muttrc"))
+  (define home/.mutt/muttrc (build-path home ".mutt" "muttrc"))
+  (unless (or (file-exists? home/.muttrc)
+              (file-exists? home/.mutt/muttrc))
+    (printf "could not locate `muttrc` file at '~a' or '~a'\n" home/.muttrc home/.mutt/muttrc)
+    (printf "creating '~a' ..." home/.muttrc)
+    (with-output-to-file home/.muttrc
+      (lambda ()
+        ;; -- basic config, credits to http://www.calmar.ws/mutt/
+        (printf "unmy_hdr *    # delete existing header settings, if any\n")
+        (printf "# my_hdr X-Homepage: http://www.google.com    # Uncomment to add your homepage to the header\n")
+        (printf "set from=\"~a\"\n" (email-prompt "for the 'from' field of outgoing messages"))
+        (printf "set realname=\"~a\"\n" (string-prompt "Please enter your name:"))
+        (printf "set folder=\"~/.mail\"\n")
+        (printf "set mbox_type=mbox\n")
+        (printf "set spoolfile=+inbox    # incoming mails (~/.mail/inbox)\n")
+        (printf "set move=yes            # yes (move read mails automatically to $mbox)\n")
+        (printf "set keep_flagged=yes    # esc-f to mark message in spool, and it won't move to $mbox)\n")
+        (printf "set mbox=+read_inbox           # ~/.mail/read_inbox\n")
+        (printf "set postponed=+postponed       # an 'internal' box for mutt basically\n")
+        (printf "set record=\"+Sent-`date +%Y`\"  # sent messages goes there (e.g. $folder/Sent-2006)\n")
+        (printf "set header_cache=~/.mail/mutt_cache/ # a much faster opening of mailboxes\n")
+        (printf "set timeout=10    # mutt 'presses' (like) a key for you (while you're idle) \n")
+        (printf "                  # each x sec to trigger the thing below\n")
+        (printf "set mail_check=5  # mutt checks for new mails on every keystroke\n")
+        (printf "                  # but not more often then once in 5 seconds\n")
+        (printf "set beep_new      # beep on new messages in the mailboxes\n")
+        (printf "\n# Mutt Guide: https://dev.mutt.org/trac/wiki/MuttGuide\n")
+        (void)))))
+
+;; -----------------------------------------------------------------------------
+
+(define INVALID-INPUT (gensym))
+
+;; Print a format string,
+;;  request a "y" or "n" from the user,
+;;  repeat if input is bad
+;; String (-> String (U Any INVALID-INPUT)) -> (U Any Eof)
+(define (prompt msg parse-input)
+  (let loop ()
+    (displayln msg)
+    (define ln (read-line))
+    (if (eof-object? ln)
+      ln
+      (let ([v (parse-input ln)])
+        (if (eq? INVALID-INPUT v)
+          (loop)
+          v)))))
+
+(define (bool-prompt msg . arg*)
+  (prompt (apply format msg arg*)
+    (lambda (x)
+      (case (string-downcase x)
+       [("y" "yes")
+        #t]
+       [("n" "no")
+        #f]
+       [else
+        INVALID-INPUT]))))
+
+;; String -> String
+(define (string-prompt msg)
+  (define v (prompt msg (lambda (x) x)))
+  (if (string? v)
+    v
+    ""))
+
+;; Prompt the user for an email address
+;; String -> String
+(define email-prompt
+  (let* ([msg "Please enter an email address (~a):"]
+         [rxEMAIL #rx"[^@]+@[^@.]+\\.[^@]+"]
+         [lam (lambda (x) (if (regexp-match? rxEMAIL x) x INVALID-INPUT))])
+    (lambda (reason)
+      (define r (prompt (format msg reason) lam))
+      (if (string? r)
+        r
+        ""))))
