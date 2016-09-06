@@ -2,9 +2,11 @@
 
 (provide
   mutt
+  mutt*
 )
 
 (require
+  mutt/private/parameters
   racket/sequence
   racket/string
   racket/system
@@ -14,15 +16,21 @@
 
 (define (mutt msg
               #:to to
-              #:subject subject
-              #:cc [cc '()]
-              #:bcc [bcc '()])
-  (system (format "mutt -s'~a' ~a ~a '~a' < ~a"
-                  subject
-                  (format-cc (emails cc))
-                  (format-bcc (emails bcc))
-                  to
-                  msg)))
+              #:subject [subject (*mutt-default-subject*)]
+              #:cc [cc (*mutt-default-cc*)]
+              #:bcc [bcc (*mutt-default-bcc*)])
+  (define mutt-cmd (format "mutt -s'~a' ~a ~a '~a'"
+                           subject
+                           (format-cc (emails cc))
+                           (format-bcc (emails bcc))
+                           to))
+  (cond
+   [(file-exists? msg)
+    (system (format "~a < ~a" mutt-cmd (path-string->string msg)))]
+   [(string? msg)
+    (system (format "echo '~a' | ~a" msg mutt-cmd))]
+   [else
+    (raise-argument-error 'mutt "(or/c string? file-exists?)" msg)]))
 
 (define (mutt* msg
                #:to* to*
@@ -54,16 +62,34 @@
 ;; Email-Coercible -> (Sequenceof Email)
 (define (in-emails v)
   (cond
+   [(null? v)
+    v]
+   [(pair? v)
+    (error 'in-emails "not implemented for ~a" v)]
+   [(file-exists? v)
+    (error 'in-emails "not implemented for ~a" v)]
+   [(path-string? v)
+    (raise-argument-error 'in-emails "file-exists?" v)]
    [(string? v)
-    (list v)]
+    (if (email? v)
+      (list v)
+      '())]
    [else
-    (error 'in-emails:not-implemented)]))
+    (error 'in-emails "not-implemented for ~a" v)]))
 
 (define (format-*cc emails prefix)
-  (string-join emails (string-append " " prefix) #:before-first (string-append prefix " ")))
+  (if (null? emails)
+    ""
+    (string-join emails (string-append " " prefix) #:before-first (string-append prefix " "))))
 
 (define (format-cc emails)
   (format-*cc emails "-c"))
 
 (define (format-bcc emails)
   (format-*cc emails "-b"))
+
+(define (path-string->string x)
+  (if (path? x)
+    (path->string x)
+    x))
+

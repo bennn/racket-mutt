@@ -1,4 +1,14 @@
 #lang racket/base
 
-(provide mutt)
-(require private/main)
+(provide
+  mutt
+  mutt*
+
+  *mutt-default-subject*
+  *mutt-default-cc*
+  *mutt-default-bcc*
+)
+
+(require
+  mutt/private/main
+  mutt/private/parameters)
