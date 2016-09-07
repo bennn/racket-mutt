@@ -7,6 +7,8 @@
 
 (require
   mutt/private/parameters
+  (only-in racket/list append*)
+  (only-in racket/file file->lines)
   racket/sequence
   racket/string
   racket/system
@@ -65,17 +67,19 @@
    [(null? v)
     v]
    [(pair? v)
-    (error 'in-emails "not implemented for ~a" v)]
+    (append* (map in-emails v))]
    [(file-exists? v)
-    (error 'in-emails "not implemented for ~a" v)]
-   [(path-string? v)
+    (in-emails (file->lines v))]
+   [(path? v)
     (raise-argument-error 'in-emails "file-exists?" v)]
    [(string? v)
     (if (email? v)
       (list v)
-      '())]
+      (begin
+        (printf "[mutt] skipping invalid email address '~a'\n" v)
+        (list)))]
    [else
-    (error 'in-emails "not-implemented for ~a" v)]))
+    (raise-argument-error 'in-emails "(or/c email? file-exists? (listof (or/c email? file-exists?)))" v)]))
 
 (define (format-*cc emails prefix)
   (if (null? emails)
