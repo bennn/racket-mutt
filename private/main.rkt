@@ -3,6 +3,8 @@
 (provide
   mutt
   mutt*
+  in-email*
+  email?
 )
 
 (require
@@ -21,7 +23,8 @@
               #:subject [subject (*mutt-default-subject*)]
               #:cc [cc (*mutt-default-cc*)]
               #:bcc [bcc (*mutt-default-bcc*)])
-  (define mutt-cmd (format "mutt -s'~a' ~a ~a '~a'"
+  (define mutt-cmd (format "~a -s'~a' ~a ~a '~a'"
+                           (path-string->string (*mutt-exe-path*))
                            subject
                            (format-cc (emails cc))
                            (format-bcc (emails bcc))
@@ -36,12 +39,12 @@
 
 (define (mutt* msg
                #:to* to*
-               #:subject subject
-               #:cc [pre-cc '()]
-               #:bcc [pre-bcc '()])
+               #:subject [subject (*mutt-default-subject*)]
+               #:cc [pre-cc (*mutt-default-cc*)]
+               #:bcc [pre-bcc (*mutt-default-bcc*)])
   (define cc (emails pre-cc))
   (define bcc (emails pre-bcc))
-  (for ((to (in-emails to*)))
+  (for/and ((to (in-email* to*)))
     (mutt msg #:to to #:subject subject #:cc cc #:bcc bcc)))
 
 ;; -----------------------------------------------------------------------------
@@ -54,24 +57,24 @@
 
 ;; String -> (U #f Email)
 (define email?
-  (let ([rxEMAIL #rx"[^@]+@[^@.]+\\.[^@]+"])
+  (let ([rxEMAIL #rx"^[^@ ]+@[^@ ]+\\.[^@ ]+$"])
     (lambda (str) (and (regexp-match? rxEMAIL str) str))))
 
 ;; Email-Coercible -> (Listof Email)
 (define (emails v)
-  (sequence->list (in-emails v)))
+  (sequence->list (in-email* v)))
 
 ;; Email-Coercible -> (Sequenceof Email)
-(define (in-emails v)
+(define (in-email* v)
   (cond
    [(null? v)
     v]
    [(pair? v)
-    (append* (map in-emails v))]
+    (append* (map in-email* v))]
    [(file-exists? v)
-    (in-emails (file->lines v))]
+    (in-email* (file->lines v))]
    [(path? v)
-    (raise-argument-error 'in-emails "file-exists?" v)]
+    (raise-argument-error 'in-email* "file-exists?" v)]
    [(string? v)
     (if (email? v)
       (list v)
@@ -79,7 +82,7 @@
         (printf "[mutt] skipping invalid email address '~a'\n" v)
         (list)))]
    [else
-    (raise-argument-error 'in-emails "(or/c email? file-exists? (listof (or/c email? file-exists?)))" v)]))
+    (raise-argument-error 'in-email* "(or/c email? file-exists? (listof (or/c email? file-exists?)))" v)]))
 
 (define (format-*cc emails prefix)
   (if (null? emails)
@@ -97,3 +100,13 @@
     (path->string x)
     x))
 
+;; =============================================================================
+
+(module+ test
+  (require rackunit)
+
+  (check-pred email? "a@a.a")
+  (check-false (email? "aaa"))
+  (check-false (email? "a a@a.a"))
+
+)
