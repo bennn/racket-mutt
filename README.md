@@ -3,15 +3,15 @@ racket-mutt
 [![Scribble](https://img.shields.io/badge/Docs-Scribble-blue.svg)](http://docs.racket-lang.org/racket-mutt/index.html)
 
 Racket `mutt` API.
-Once installed, you can send emails with:
+Installing this package helps setup `mutt`. Then you can send emails:
 
 ```
 #lang racket/base
 (require mutt)
 
-(mutt "Just saying hi"
-      #:to "user@gmail.com"
-      #:subject "hello world")
+(mutt "Listen, Boy"
+      #:subject "My First Love Story"
+      #:to "geegeegeegee@baby.baby")
 ```
 
 NOTE: this package does not currently support Windows systems.
@@ -50,7 +50,7 @@ API
   Accepts the same options too, except for `#:to`.
 
 See the documentation for more.
-In particular, `message` can be a string or a file.
+In particular, `message` can be a string or a file with newline-separated emails.
 
 
 FAQ
