@@ -16,3 +16,4 @@
 (defparam *mutt-default-bcc* : (Listof Email) '())
 
 (defparam *mutt-exe-path* : Path-String (find-executable-path "mutt"))
+

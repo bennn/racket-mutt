@@ -1,5 +1,6 @@
 racket-mutt
 ====
+[![Build Status](https://travis-ci.org/bennn/racket-mutt.svg)](https://travis-ci.org/bennn/racket-mutt)
 [![Scribble](https://img.shields.io/badge/Docs-Scribble-blue.svg)](http://docs.racket-lang.org/racket-mutt/index.html)
 
 Racket `mutt` API.

@@ -8,7 +8,7 @@
               #:bcc Pre-Email*]
              Boolean)]
   [mutt* (->* [Path-String
-               #:to String]
+               #:to* String]
               [#:subject String
                #:cc Pre-Email*
                #:bcc Pre-Email*]
@@ -16,7 +16,7 @@
   [in-email* (-> Pre-Email* (Listof String))]
   [email? (-> String (U #f String))])
 
-(require/typed mutt/private/parameters
+(require/typed/provide mutt/private/parameters
   [*mutt-default-subject* (Parameterof String)]
   [*mutt-default-cc* (Parameterof (Listof String))]
   [*mutt-default-bcc* (Parameterof (Listof String))]

@@ -136,7 +136,28 @@
 ;; String -> String
 (define email-prompt
   (let* ([msg "Please enter an email address (~a):"]
-         [rxEMAIL #rx"[^@]+@[^@.]+\\.[^@]+"]
+         [rxEMAIL #rx"^[^@ ]+@[^@ ]+\\.[^@ ]+$"]
          [lam (lambda (x) (if (regexp-match? rxEMAIL x) x INVALID-INPUT))])
     (lambda (reason)
       (prompt/fail (format msg reason) lam))))
+
+;; =============================================================================
+
+(module+ test
+  (require rackunit)
+
+  (test-case "prompt"
+  )
+
+  (test-case "prompt/fail"
+  )
+
+  (test-case "bool-prompt"
+  )
+
+  (test-case "string-prompt"
+  )
+
+  (test-case "email-prompt"
+  )
+)

@@ -23,11 +23,24 @@
               #:subject [subject (*mutt-default-subject*)]
               #:cc [cc (*mutt-default-cc*)]
               #:bcc [bcc (*mutt-default-bcc*)])
+  (mutt/internal msg to subject (in-email* cc) (in-email* bcc)))
+
+(define (mutt* msg
+               #:to* to*
+               #:subject [subject (*mutt-default-subject*)]
+               #:cc [pre-cc (*mutt-default-cc*)]
+               #:bcc [pre-bcc (*mutt-default-bcc*)])
+  (define cc (in-email* pre-cc))
+  (define bcc (in-email* pre-bcc))
+  (for/and ((to (in-email* to*)))
+    (mutt/internal msg to subject cc bcc)))
+
+(define (mutt/internal msg to subject cc bcc)
   (define mutt-cmd (format "~a -s'~a' ~a ~a '~a'"
                            (path-string->string (*mutt-exe-path*))
                            subject
-                           (format-cc (emails cc))
-                           (format-bcc (emails bcc))
+                           (format-cc cc)
+                           (format-bcc bcc)
                            to))
   (cond
    [(file-exists? msg)
@@ -36,16 +49,6 @@
     (system (format "echo '~a' | ~a" msg mutt-cmd))]
    [else
     (raise-argument-error 'mutt "(or/c string? file-exists?)" msg)]))
-
-(define (mutt* msg
-               #:to* to*
-               #:subject [subject (*mutt-default-subject*)]
-               #:cc [pre-cc (*mutt-default-cc*)]
-               #:bcc [pre-bcc (*mutt-default-bcc*)])
-  (define cc (emails pre-cc))
-  (define bcc (emails pre-bcc))
-  (for/and ((to (in-email* to*)))
-    (mutt msg #:to to #:subject subject #:cc cc #:bcc bcc)))
 
 ;; -----------------------------------------------------------------------------
 
@@ -59,10 +62,6 @@
 (define email?
   (let ([rxEMAIL #rx"^[^@ ]+@[^@ ]+\\.[^@ ]+$"])
     (lambda (str) (and (regexp-match? rxEMAIL str) str))))
-
-;; Email-Coercible -> (Listof Email)
-(define (emails v)
-  (sequence->list (in-email* v)))
 
 ;; Email-Coercible -> (Sequenceof Email)
 (define (in-email* v)
@@ -87,7 +86,7 @@
 (define (format-*cc emails prefix)
   (if (null? emails)
     ""
-    (string-join emails (string-append " " prefix) #:before-first (string-append prefix " "))))
+    (string-join emails (string-append " " prefix " ") #:before-first (string-append prefix " "))))
 
 (define (format-cc emails)
   (format-*cc emails "-c"))
@@ -103,10 +102,58 @@
 ;; =============================================================================
 
 (module+ test
-  (require rackunit)
+  (require rackunit rackunit-abbrevs)
 
-  (check-pred email? "a@a.a")
-  (check-false (email? "aaa"))
-  (check-false (email? "a a@a.a"))
+  (test-case "email?"
+    (check-apply* email?
+     ["a@a.a"
+      ==> "a@a.a"]
+     ["thomas@jefferson.whitehouse"
+      ==> "thomas@jefferson.whitehouse"]
+     ["aaa"
+      ==> #f]
+     ["a a@a.a"
+      ==> #f]
+     [""
+      ==> #f])
+  )
+
+  (test-case "format-*cc"
+    (check-apply* format-*cc
+     ['() "a"
+      ==> ""]
+     ['() "yo"
+      ==> ""]
+     ['("a" "b" "c") "--"
+      ==> "-- a -- b -- c"]
+     ['("world") "hello"
+      ==> "hello world"])
+  )
+
+  (test-case "format-bcc"
+    (check-apply* format-bcc
+     ['()
+      ==> ""]
+     ['("lincoln" "madison" "buchanan")
+      ==> "-b lincoln -b madison -b buchanan"])
+  )
+
+  (test-case "format-cc"
+    (check-apply* format-cc
+     ['()
+      ==> ""]
+     ['("A" "B")
+      ==> "-c A -c B"]
+     ['("monroe" "fillmore" "wilson" "adams")
+      ==> "-c monroe -c fillmore -c wilson -c adams"])
+  )
+
+  (test-case "path-string->string"
+    (check-apply* path-string->string
+     ["foo"
+      ==> "foo"]
+     [(string->path "foo")
+      ==> "foo"])
+  )
 
 )
