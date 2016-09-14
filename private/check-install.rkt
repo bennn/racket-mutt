@@ -15,10 +15,11 @@
 (define errloc 'mutt:pre-install)
 
 (define (pre-installer collections-top-path racl-path)
-  (check-system-type)
-  (check-mutt)
-  (check-mail)
-  (check-muttrc)
+  (unless (getenv "PLT_PKG_BUILD_SERVICE")
+    (check-system-type)
+    (check-mutt)
+    (check-mail)
+    (check-muttrc))
   (void))
 
 ;; 2016-09-06: Windows isn't supported because Windows isn't tested.
