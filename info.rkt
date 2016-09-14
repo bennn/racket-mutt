@@ -6,4 +6,4 @@
 (define version "0.1")
 (define pkg-authors '(ben))
 (define scribblings '(("scribblings/mutt.scrbl" () ("Email"))))
-(define pre-install-collection "private/check-install.rkt")
+(define pre-install-collection "private/pre-install.rkt")
