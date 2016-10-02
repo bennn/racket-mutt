@@ -15,7 +15,8 @@
 (define errloc 'mutt:pre-install)
 
 (define (pre-installer collections-top-path racl-path)
-  (unless (getenv "PLT_PKG_BUILD_SERVICE")
+  (unless (or (getenv "PLT_PKG_BUILD_SERVICE")
+              (getenv "TRAVIS"))
     (check-system-type)
     (check-mutt)
     (check-mail)

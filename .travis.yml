@@ -16,7 +16,7 @@ install: raco pkg install --deps search-auto $TRAVIS_BUILD_DIR
 
 script:
  - raco test $TRAVIS_BUILD_DIR
- - raco setup --check-pkg-deps racket-mutt
+ - raco setup --check-pkg-deps mutt
 
 after_success:
  - raco pkg install --deps search-auto cover
