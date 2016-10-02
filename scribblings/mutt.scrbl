@@ -161,20 +161,21 @@ Alternatively, the @racketmodname[mutt/setup] module provides a hook for reconfi
 
 @subsection{Options and Parameters}
 
-@defthing[*mutt-default-subject* (parameter/c string?) #:value "<no-subject>"]{
+@defparam[*mutt-default-subject* subject string? #:value "<no-subject>"]{
   Default subject to use in email addresses.
 }
 
-@defthing[*mutt-default-cc* (parameter/c (listof email?)) #:value '()]{
+@defparam[*mutt-default-cc* addrs (listof email?) #:value '()]{
   List of addresses to cc by default.
 }
 
-@defthing[*mutt-default-bcc* (parameter/c (listof email?)) #:value '()]{
+@defparam[*mutt-default-bcc* addrs (listof email?) #:value '()]{
   List of addresses to bcc by default.
 }
 
-@defthing[*mutt-exe-path* (parameter/c path-string?) #:value (find-executable-path "mutt")]{
+@defparam[*mutt-exe-path* path (or/c #f path-string?) #:value (find-executable-path "mutt")]{
   Path to your @|mutt-exe| executable.
+  If @racket[#f], calls to @racket[mutt] will fail.
 }
 
 @include-section{typed-mutt.scrbl}
