@@ -36,8 +36,14 @@
     (mutt/internal msg to subject cc bcc)))
 
 (define (mutt/internal msg to subject cc bcc)
+  (define mutt-exe
+    (let ([exe (*mutt-exe-path*)])
+      (if exe
+        (path-string->string exe)
+        (raise-user-error 'mutt
+          "cannot send email because parameter `*mutt-exe-path*` is `#f`"))))
   (define mutt-cmd (format "~a -s'~a' ~a ~a '~a'"
-                           (path-string->string (*mutt-exe-path*))
+                           mutt-exe
                            subject
                            (format-cc cc)
                            (format-bcc bcc)

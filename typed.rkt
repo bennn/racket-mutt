@@ -20,7 +20,7 @@
   [*mutt-default-subject* (Parameterof String)]
   [*mutt-default-cc* (Parameterof (Listof String))]
   [*mutt-default-bcc* (Parameterof (Listof String))]
-  [*mutt-exe-path* (Parameterof Path-String)])
+  [*mutt-exe-path* (Parameterof (U #f Path-String))])
 
 (provide
   Pre-Email

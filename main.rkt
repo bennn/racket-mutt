@@ -40,7 +40,7 @@
     (parameter/c (listof email?))]
 
    [*mutt-exe-path*
-    (parameter/c path-string?)]
+    (parameter/c (or/c #f path-string?))]
 
    [email?
     (-> string? (or/c #f string?))]

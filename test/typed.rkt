@@ -51,4 +51,10 @@
       ==> '("john@doe.com" "jane@doe.gov" "hello@world.io")])
   )
 
+  (test-case "mutt-exe-path-is-#f"
+    (check-exn exn:fail:user?
+      (lambda ()
+        (parameterize ([*mutt-exe-path* #f])
+          (mutt "yo" #:to "lo@yo.lo")))))
+
 )
