@@ -64,6 +64,15 @@ Example:
 ]
 
 If you delete your @|muttrc| file, running @tt{raco pkg update mutt} will rebuild it interactively.
+Alternatively, the @racketmodname[mutt/setup] module provides a hook for reconfiguring @tt{mutt}.
+
+@defmodule[mutt/setup]
+
+@defproc[(setup-mutt!) void?]{
+  Checks that the @tt{mutt} utility is available and creates a default @|muttrc| file if none exists.
+
+  This function sends prompts to @racket[current-output-port] and expects responses on @racket[current-input-port].
+}
 
 
 @section{API}
