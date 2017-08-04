@@ -31,7 +31,7 @@
 ;; Check for `mutt` executable,
 ;;  raise error if it's not found
 (define (check-mutt)
-  (unless (system "type mutt >& /dev/null")
+  (unless (find-executable-path "mutt")
     (raise-user-error errloc "could not locate `mutt` executable, install with your package manager and try again")))
 
 ;; Check for a mailbox folder
