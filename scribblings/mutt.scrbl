@@ -3,8 +3,7 @@
   scribble/eval
   scriblib/footnote
   racket/contract
-  mutt
-  (for-label racket/base racket/contract)
+  (for-label mutt racket/base racket/contract)
 ]
 
 @title[#:tag "top"]{Mutt API}
@@ -100,7 +99,7 @@ Alternatively, the @racketmodname[mutt/setup] module provides a hook for reconfi
           #:to "tswift@gmail.com"
           #:subject "We Are Never Ever Getting Back Together")
 
-    (mutt "https://www.youtube.com/watch?v=eLYbDg242EY"
+    (mutt "https://www.youtube.com/watch?v=oHg5SJYRHA0"
           #:to "support@comcast.com"
           #:subject "10 Craziest YouTube Fails"
           #:cc "everyone@the.net")

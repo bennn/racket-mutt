@@ -1,7 +1,8 @@
 #lang scribble/manual
 @require[
-  mutt
-  (for-label racket/base racket/contract)
+  (for-label mutt/typed racket/base racket/contract
+             (only-in typed/racket/base
+               Path-String String Boolean Listof U Parameterof))
 ]
 
 @title{Typed API}
