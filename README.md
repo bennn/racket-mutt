@@ -57,8 +57,7 @@ In particular, `message` can be a string or a file with newline-separated emails
 FAQ
 ---
 
-#### Q. gmail says "This message may not have been send by <me>"
+#### Q. Can I accept certificates on the command line?
 
-This happens if you are sending from a gmail address to another gmail address.
-Changing your `~/.muttrc` should fix it, but I don't know how yet. See [Issue 1](https://github.com/bennn/racket-mutt/issues/1).
-
+No. Run `mutt` on the command line to manually approve certificates.
+(Make sure to "always accept" the certificate.)

@@ -187,7 +187,7 @@ Alternatively, the @racketmodname[mutt/setup] module provides a hook for reconfi
 @;          "\n"
 @;          (elem a*)))
 
-@bold{Q. gmail says 'This message may not have been sent by ....'}
+@bold{Q. Can @tt{racket-mutt} accept certificates on the command line?}
 
-  The problem is that you are using a gmail address but haven't given gmail authentication info in your @|muttrc|.
-  I am not sure what info is required; better answer coming soon.
+No. Run @exec{mutt} on the command line to manually approve certificates.
+(Make sure to "always accept" the certificate.)
