@@ -22,32 +22,35 @@
               #:to to
               #:subject [subject (*mutt-default-subject*)]
               #:cc [cc (*mutt-default-cc*)]
-              #:bcc [bcc (*mutt-default-bcc*)])
-  (mutt/internal msg to subject (in-email* cc) (in-email* bcc)))
+              #:bcc [bcc (*mutt-default-bcc*)]
+              #:attachment [att* (*mutt-default-attachment*)])
+  (mutt/internal msg to subject (in-email* cc) (in-email* bcc) (in-attach* att*)))
 
 (define (mutt* msg
                #:to* to*
                #:subject [subject (*mutt-default-subject*)]
                #:cc [pre-cc (*mutt-default-cc*)]
-               #:bcc [pre-bcc (*mutt-default-bcc*)])
+               #:bcc [pre-bcc (*mutt-default-bcc*)]
+               #:attachment [pre-att* (*mutt-default-attachment*)])
+  (define att* (in-attach* pre-att*))
   (define cc (in-email* pre-cc))
   (define bcc (in-email* pre-bcc))
   (for/and ((to (in-email* to*)))
-    (mutt/internal msg to subject cc bcc)))
+    (mutt/internal msg to subject cc bcc att*)))
 
-(define (mutt/internal msg to subject cc bcc)
+(define (mutt/internal msg to subject cc bcc att*)
   (define mutt-exe
     (let ([exe (*mutt-exe-path*)])
       (if exe
         (path-string->string exe)
         (raise-user-error 'mutt
           "cannot send email because parameter `*mutt-exe-path*` is `#f`"))))
-  (define mutt-cmd (format "~a -s'~a' ~a ~a '~a'"
+  (define mutt-cmd (format "~a -s'~a' ~a ~a ~a"
                            mutt-exe
                            subject
                            (format-cc cc)
                            (format-bcc bcc)
-                           to))
+                           (format-to+attachments to att*)))
   (cond
    [(file-exists? msg)
     (system (format "~a < ~a" mutt-cmd (path-string->string msg)))]
@@ -68,6 +71,16 @@
 (define email?
   (let ([rxEMAIL #rx"^[^@ ]+@[^@ ]+\\.[^@ ]+$"])
     (lambda (str) (and (regexp-match? rxEMAIL str) str))))
+
+;; (U #f Path-String (Listof Path-String)) -> (U #f (Pairof Path-String (Listof Path-String)))
+(define (in-attach* att*)
+  (if (or (not att*) (null? att*))
+    #f
+    (cond
+     [(path-string? att*)
+      (list att*)]
+     [else
+      att*])))
 
 ;; Email-Coercible -> (Sequenceof Email)
 (define (in-email* v)
@@ -100,6 +113,12 @@
 (define (format-bcc emails)
   (format-*cc emails "-b"))
 
+(define (format-to+attachments pre-to att*)
+  (define to-str (format "'~a'" pre-to))
+  (if att*
+    (string-append (format-*cc att* "-a") " -- " to-str)
+    to-str))
+
 (define (path-string->string x)
   (if (path? x)
     (path->string x)
@@ -123,6 +142,17 @@
      [""
       ==> #f])
   )
+
+  (test-case "in-attach*"
+    (check-apply* in-attach*
+     ['()
+      ==> #f]
+     [#f
+      ==> #f]
+     ["z.png"
+      ==> '("z.png")]
+     ['("file1.jpg" "file2.jpg")
+      ==> '("file1.jpg" "file2.jpg")]))
 
   (test-case "format-*cc"
     (check-apply* format-*cc
@@ -152,6 +182,14 @@
       ==> "-c A -c B"]
      ['("monroe" "fillmore" "wilson" "adams")
       ==> "-c monroe -c fillmore -c wilson -c adams"])
+  )
+
+  (test-case "format-to+attachments"
+    (check-apply* format-to+attachments
+     ["sam@sam.gov" #f
+      ==> "'sam@sam.gov'"]
+     ["dave@republic.io" '("free.jpg")
+      ==> "-a free.jpg -- 'dave@republic.io'"])
   )
 
   (test-case "path-string->string"

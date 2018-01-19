@@ -14,7 +14,8 @@
    [mutt
     (->* [path-string?
           #:to string?]
-         [#:subject string?
+         [#:attachment attachment/c
+          #:subject string?
           #:cc pre-email*/c
           #:bcc pre-email*/c]
          boolean?)]
@@ -22,7 +23,8 @@
    [mutt*
     (->* [path-string?
           #:to* pre-email*/c]
-         [#:subject string?
+         [#:attachment attachment/c
+          #:subject string?
           #:cc pre-email*/c
           #:bcc pre-email*/c]
          boolean?)]
@@ -45,9 +47,13 @@
    [email?
     (-> string? (or/c #f string?))]
 )
+   attachment/c
    pre-email/c
    pre-email*/c
 )
+
+(define attachment/c
+  (or/c #f path-string? (listof path-string?)))
 
 (define pre-email/c
   (or/c string? path-string?))

@@ -15,19 +15,22 @@ Typed clients should import the @racketmodname[mutt/typed] module.
                       #:to String]
                      [#:subject String
                       #:cc Pre-Email*
-                      #:bcc Pre-Email*]
+                      #:bcc Pre-Email*
+                      #:attachment (U #f Path-String (Listof Path-String))]
                      Boolean)]
  @defthing[mutt* (->* [Path-String
                        #:to String]
                       [#:subject String
                        #:cc Pre-Email*
-                       #:bcc Pre-Email*]
+                       #:bcc Pre-Email*
+                       #:attachment (U #f Path-String (Listof Path-String))]
                       Boolean)]
  @defthing[in-email* (-> Pre-Email* (Listof String))]
  @defthing[email? (-> String (U #f String))]
  @defthing[*mutt-default-subject* (Parameterof String)]
  @defthing[*mutt-default-cc* (Parameterof (Listof String))]
  @defthing[*mutt-default-bcc* (Parameterof (Listof String))]
+ @defthing[*mutt-default-attachment* (Parameterof (Listof Path-String))]
  @defthing[*mutt-exe-path* (Parameterof Path-String)]
 )]{}
 

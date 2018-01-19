@@ -12,6 +12,7 @@
 
 (defparam *mutt-default-subject* : String "<no-subject>")
 
+(defparam *mutt-default-attachment* : (Listof Path-String) '())
 (defparam *mutt-default-cc* : (Listof Email) '())
 (defparam *mutt-default-bcc* : (Listof Email) '())
 

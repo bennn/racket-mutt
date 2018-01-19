@@ -85,7 +85,8 @@ Alternatively, the @racketmodname[mutt/setup] module provides a hook for reconfi
                [#:to to email?]
                [#:subject subject string? (*mutt-default-subject*)]
                [#:cc cc pre-email*/c (*mutt-default-cc*)]
-               [#:bcc bcc pre-email*/c (*mutt-default-bcc*)])
+               [#:bcc bcc pre-email*/c (*mutt-default-bcc*)]
+               [#:attachment attach* attachment/c (*mutt-default-attachment*)])
          boolean?]{
   Send an email to the address @racket[to] with subject @racket[subject] and message body @racket[message].
   If @racket[message] is a filename, the email contains the contents of the file.
@@ -93,6 +94,7 @@ Alternatively, the @racketmodname[mutt/setup] module provides a hook for reconfi
 
   Send carbon copies to the @racket[cc] addresses; these are public recipients of the same message.
   Send blind carbon copies to the @racket[bcc] addresses; the @racket[to] address will not see the identity of @racket[bcc]s.
+  Attach the files in the list @racket[attach*].
 
   @examples[#:eval mutt-eval
     (mutt "sry"
@@ -110,9 +112,10 @@ Alternatively, the @racketmodname[mutt/setup] module provides a hook for reconfi
                 [#:to* to pre-email*/c]
                 [#:subject subject string? (*mutt-default-subject*)]
                 [#:cc cc pre-email*/c (*mutt-default-cc*)]
-                [#:bcc bcc pre-email*/c (*mutt-default-bcc*)])
+                [#:bcc bcc pre-email*/c (*mutt-default-bcc*)]
+                [#:attachment attach* attachment/c (*mutt-default-attachment*)])
          boolean?]{
-  For each recipient address in @racket[to*], send an identical email message and include the same cc's and bcc's.
+  For each recipient address in @racket[to*], send an identical email message and include the same cc's, bcc's, and attachments.
 
   @examples[#:eval mutt-eval
     (define pilots
@@ -158,6 +161,10 @@ Alternatively, the @racketmodname[mutt/setup] module provides a hook for reconfi
   Raises an argument error if @racket[pre*] contains a path that does not exist on the local filesystem.
 }
 
+@defthing[attachment/c (or/c #f path-string? (listof path-string?))]{
+  Contract for an argument that specifies a file (or files) to attach to an email.
+}
+
 @subsection{Options and Parameters}
 
 @defparam[*mutt-default-subject* subject string? #:value "<no-subject>"]{
@@ -170,6 +177,10 @@ Alternatively, the @racketmodname[mutt/setup] module provides a hook for reconfi
 
 @defparam[*mutt-default-bcc* addrs (listof email?) #:value '()]{
   List of addresses to bcc by default.
+}
+
+@defparam[*mutt-default-attachment* files (listof path-string?) #:value '()]{
+  List of files to attach by default.
 }
 
 @defparam[*mutt-exe-path* path (or/c #f path-string?) #:value (find-executable-path "mutt")]{

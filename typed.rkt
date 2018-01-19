@@ -5,19 +5,22 @@
               #:to String]
              [#:subject String
               #:cc Pre-Email*
-              #:bcc Pre-Email*]
+              #:bcc Pre-Email*
+              #:attachment (U #f Path-String (Listof Path-String))]
              Boolean)]
   [mutt* (->* [Path-String
                #:to* String]
               [#:subject String
                #:cc Pre-Email*
-               #:bcc Pre-Email*]
+               #:bcc Pre-Email*
+               #:attachment (U #f Path-String (Listof Path-String))]
               Boolean)]
   [in-email* (-> Pre-Email* (Listof String))]
   [email? (-> String (U #f String))])
 
 (require/typed/provide mutt/private/parameters
   [*mutt-default-subject* (Parameterof String)]
+  [*mutt-default-attachment* (Parameterof (Listof Path-String))]
   [*mutt-default-cc* (Parameterof (Listof String))]
   [*mutt-default-bcc* (Parameterof (Listof String))]
   [*mutt-exe-path* (Parameterof (U #f Path-String))])
