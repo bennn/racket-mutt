@@ -50,8 +50,7 @@ API
   Similar to `mutt`, but send the same message to a list of recipients.
   Accepts the same options too, except for `#:to`.
 
-See the documentation for more.
-In particular, `message` can be a string or a file with newline-separated emails.
+See the documentation for more: <http://docs.racket-lang.org/racket-mutt/index.html>
 
 
 FAQ
