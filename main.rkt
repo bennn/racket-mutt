@@ -46,10 +46,13 @@
 
    [email?
     (-> string? (or/c #f string?))]
-)
-   attachment/c
-   pre-email/c
-   pre-email*/c
+
+   [mutt-logger
+     logger?]
+  )
+  attachment/c
+  pre-email/c
+  pre-email*/c
 )
 
 (define attachment/c

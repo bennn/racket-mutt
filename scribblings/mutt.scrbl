@@ -185,7 +185,14 @@ Alternatively, the @racketmodname[mutt/setup] module provides a hook for reconfi
 
 @defparam[*mutt-exe-path* path (or/c #f path-string?) #:value (find-executable-path "mutt")]{
   Path to your @|mutt-exe| executable.
-  If @racket[#f], calls to @racket[mutt] will fail.
+  If @racket[#f], calls to @racket[mutt] will never send emails.
+  This is useful for debugging --- set the parameter to @racket[#false]
+  and subscribe to the @racket[mutt-logger] at the @racket['info] level
+  to see the system commands that would be invoked.
+}
+
+@defthing[mutt-logger logger?]{
+  A @tech[#:doc '(lib "scribblings/reference/reference.scrbl")]{logger} that reports events with the topic @racket['mutt].
 }
 
 @include-section{typed-mutt.scrbl}

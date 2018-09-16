@@ -5,7 +5,7 @@
   mutt*
   in-email*
   email?
-)
+  mutt-logger)
 
 (require
   mutt/private/parameters
@@ -17,6 +17,8 @@
 )
 
 ;; =============================================================================
+
+(define-logger mutt)
 
 (define (mutt msg
               #:to to
@@ -43,19 +45,24 @@
     (let ([exe (*mutt-exe-path*)])
       (if exe
         (path-string->string exe)
-        (raise-user-error 'mutt
-          "cannot send email because parameter `*mutt-exe-path*` is `#f`"))))
+        (begin
+          (log-mutt-warning "cannot send mail because parameter `*mutt-exe-path*` is `#f`")
+          #f))))
   (define mutt-cmd (format "~a -s'~a' ~a ~a ~a"
-                           mutt-exe
+                           (or mutt-exe '<mutt-exe>)
                            subject
                            (format-cc cc)
                            (format-bcc bcc)
                            (format-to+attachments to att*)))
   (cond
    [(file-exists? msg)
-    (system (format "~a < ~a" mutt-cmd (path-string->string msg)))]
+    (define full-command (format "~a < ~a" mutt-cmd (path-string->string msg)))
+    (log-mutt-command full-command)
+    (and mutt-exe (system full-command))]
    [(string? msg)
-    (system (format "echo '~a' | ~a" msg mutt-cmd))]
+    (define full-command (format "echo '~a' | ~a" msg mutt-cmd))
+    (log-mutt-command full-command)
+    (and mutt-exe (system full-command))]
    [else
     (raise-argument-error 'mutt "(or/c string? file-exists?)" msg)]))
 
@@ -123,6 +130,9 @@
   (if (path? x)
     (path->string x)
     x))
+
+(define (log-mutt-command str)
+  (log-mutt-info "send :: ~a" str))
 
 ;; =============================================================================
 
