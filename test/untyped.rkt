@@ -52,7 +52,7 @@
   )
 
   (test-case "mutt-exe-path-is-#f"
-    (check-exn exn:fail:user?
+    (check-not-exn
       (lambda ()
         (parameterize ([*mutt-exe-path* #f])
           (mutt "yo" #:to "lo@yo.lo")))))
