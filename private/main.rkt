@@ -10,7 +10,7 @@
 (require
   mutt/private/parameters
   (only-in racket/list append*)
-  (only-in racket/file file->lines)
+  (only-in racket/file file->lines file->string)
   racket/sequence
   racket/string
   racket/system
@@ -48,7 +48,7 @@
         (begin
           (log-mutt-warning "cannot send mail because parameter `*mutt-exe-path*` is `#f`")
           #f))))
-  (define mutt-cmd (format "~a -s'~a' ~a ~a ~a"
+  (define mutt-cmd (format "~a -s ~s ~a ~a ~a"
                            (or mutt-exe '<mutt-exe>)
                            subject
                            (format-cc cc)
@@ -56,15 +56,31 @@
                            (format-to+attachments to att*)))
   (cond
    [(file-exists? msg)
-    (define full-command (format "~a < ~a" mutt-cmd (path-string->string msg)))
-    (log-mutt-command full-command)
-    (and mutt-exe (system full-command))]
+    (mutt-send/internal mutt-exe mutt-cmd (path-string->string msg))]
    [(string? msg)
-    (define full-command (format "echo '~a' | ~a" msg mutt-cmd))
-    (log-mutt-command full-command)
-    (and mutt-exe (system full-command))]
+    (with-tmpfile
+      (lambda (ps)
+        (with-output-to-file ps (lambda () (displayln msg)))
+        (mutt-send/internal mutt-exe mutt-cmd (path-string->string ps))))]
    [else
     (raise-argument-error 'mutt "(or/c string? file-exists?)" msg)]))
+
+(define (mutt-send/internal mutt-exe mutt-cmd path-str)
+  (define full-command (format "~a < ~a" mutt-cmd path-str))
+  (log-mutt-command full-command)
+  (log-mutt-debug "send :: message :: ~a" (file->string path-str))
+  (and mutt-exe (system full-command)))
+
+(define (with-tmpfile f)
+  (define tmp (find-system-path 'temp-dir))
+  (define tmp-file
+    (for/or ((i (in-naturals)))
+      (define name (build-path tmp (format "mutt-message-~a.txt" i)))
+      (and (not (file-exists? name)) name)))
+  (begin0
+    (f tmp-file)
+    (when (file-exists? tmp-file)
+      (delete-file tmp-file))))
 
 ;; -----------------------------------------------------------------------------
 
