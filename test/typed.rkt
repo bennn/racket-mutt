@@ -3,6 +3,7 @@
 
   (require
     mutt/typed
+    mutt/test/util
     typed/rackunit
     rackunit-abbrevs/typed
     racket/string
@@ -19,24 +20,30 @@
         (close-output-port p)
         (check-equal? (string-split actual) expected))))
 
-  (define email_addrs "./email_addrs.txt")
-  (define sample_msg  "./sample_message.txt")
-
   (test-case "mutt"
     (check-mutt [mutt "hello" #:to "adam@west.co" #:subject "hi"]
-                '("-shi" "adam@west.co" "hello"))
+                '("-s" "hi" "adam@west.co" "hello"))
     (check-mutt [mutt "bye" #:to "mae@west.it" #:subject "yo" #:cc "a@a.a"]
-                '("-syo" "-c" "a@a.a" "mae@west.it" "bye"))
+                '("-s" "yo" "-c" "a@a.a" "mae@west.it" "bye"))
     (check-mutt [mutt "yes" #:to "felix@cat.ct" #:subject "--" #:cc '("mr@dont.play") #:bcc '("we@pa.com" "www@dotcom.com")]
-                '("-s--" "-c" "mr@dont.play" "-b" "we@pa.com" "-b" "www@dotcom.com" "felix@cat.ct" "yes"))
+                '("-s" "--" "-c" "mr@dont.play" "-b" "we@pa.com" "-b" "www@dotcom.com" "felix@cat.ct" "yes"))
     (check-mutt [mutt sample_msg #:to "arthur@frayn.zo" #:cc email_addrs #:bcc (list (string->path email_addrs))]
-                '("-s<no-subject>" "-c" "john@doe.com" "-c" "jane@doe.gov" "-b" "john@doe.com" "-b" "jane@doe.gov" "arthur@frayn.zo" "we" "trippy" "mane"))
+                '("-s" "<no-subject>" "-c" "john@doe.com" "-c" "jane@doe.gov" "-b" "john@doe.com" "-b" "jane@doe.gov" "arthur@frayn.zo" "we" "trippy" "mane"))
+
+    (let-values (((x log#) (mutt-interceptor
+                             (lambda ()
+                               (parameterize ((*mutt-exe-path* #false))
+                                 (mutt "You won't believe the \"quotes\"" #:to "anon@anon.net" #:subject "you won't believe"))))))
+      (check string-prefix? (assert (car (assert (hash-ref log# 'info) pair?)) string?)
+                            "mutt: send :: <mutt-exe> -s \"you won't believe\"   'anon@anon.net' < ")
+      (check-equal? (hash-ref log# 'warning)
+                    '("mutt: cannot send mail because parameter `*mutt-exe-path*` is `#f`")))
   )
 
   (test-case "mutt*"
     (check-mutt [mutt* (string->path sample_msg) #:to* email_addrs #:subject "fyi"]
-                '("-sfyi" "john@doe.com" "we" "trippy" "mane"
-                  "-sfyi" "jane@doe.gov" "we" "trippy" "mane"))
+                '("-s" "fyi" "john@doe.com" "we" "trippy" "mane"
+                  "-s" "fyi" "jane@doe.gov" "we" "trippy" "mane"))
   )
 
   (test-case "in-email*"
