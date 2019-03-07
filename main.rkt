@@ -41,6 +41,9 @@
    [*mutt-default-bcc*
     (parameter/c (listof email?))]
 
+   [*mutt-default-attachment*
+    (parameter/c (listof path-string?))]
+
    [*mutt-exe-path*
     (parameter/c (or/c #f path-string?))]
 
