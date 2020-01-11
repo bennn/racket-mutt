@@ -3,7 +3,7 @@
   scribble/eval
   scriblib/footnote
   racket/contract
-  (for-label mutt racket/base racket/contract)
+  (for-label mutt racket/base racket/contract (only-in scribble/core content?))
 ]
 
 @title[#:tag "top"]{Mutt API}
@@ -81,7 +81,7 @@ Alternatively, the @racketmodname[mutt/setup] module provides a hook for reconfi
              (*mutt-exe-path* "xargs echo ")
              (current-output-port (open-output-nowhere)))))
 
-@defproc[(mutt [message path-string?]
+@defproc[(mutt [message (or/c path-string? content?)] ...+
                [#:to to email?]
                [#:subject subject string? (*mutt-default-subject*)]
                [#:cc cc pre-email*/c (*mutt-default-cc*)]
@@ -106,9 +106,25 @@ Alternatively, the @racketmodname[mutt/setup] module provides a hook for reconfi
           #:subject "10 Craziest YouTube Fails"
           #:cc "everyone@the.net")
   ]
+
+  Or, with the @racketmodname[at-exp] reader:
+
+  @codeblock[#:keep-lang-line? #true]|{
+    #lang at-exp racket/base
+    (require mutt racket/port)
+    (*mutt-exe-path* "xargs echo ")
+
+    (define name "Lizzo")
+
+    @mutt[#:to "lizzo@juice.net"
+          #:subject "truth"]{
+      Greetings @|name|,
+
+      How are you feeling today?}
+  }|
 }
 
-@defproc[(mutt* [message path-string?]
+@defproc[(mutt* [message (or/c path-string? content?)] ...+
                 [#:to* to pre-email*/c]
                 [#:subject subject string? (*mutt-default-subject*)]
                 [#:cc cc pre-email*/c (*mutt-default-cc*)]

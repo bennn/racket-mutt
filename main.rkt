@@ -5,6 +5,7 @@
   mutt/private/parameters
   racket/contract
   (only-in racket/sequence sequence/c)
+  (only-in scribble/core content?)
 )
 
 ;; -----------------------------------------------------------------------------
@@ -12,21 +13,23 @@
 (provide
   (contract-out
    [mutt
-    (->* [path-string?
+    (->* [(or/c path-string? string? pair?)
           #:to string?]
          [#:attachment attachment/c
           #:subject string?
           #:cc pre-email*/c
           #:bcc pre-email*/c]
+         #:rest content?
          boolean?)]
 
    [mutt*
-    (->* [path-string?
+    (->* [(or/c path-string? string? pair?)
           #:to* pre-email*/c]
          [#:attachment attachment/c
           #:subject string?
           #:cc pre-email*/c
           #:bcc pre-email*/c]
+         #:rest content?
          boolean?)]
 
    [in-email*

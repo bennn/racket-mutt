@@ -23,6 +23,8 @@
   (test-case "mutt"
     (check-mutt [mutt "hello" #:to "adam@west.co" #:subject "hi"]
                 `("-s" "hi" "adam@west.co" "hello"))
+    (check-mutt [mutt "hello" #:to "adam@west.co" #:subject "hi" "and" '("mo" ("re"))]
+                `("-s" "hi" "adam@west.co" "hello" "andmore"))
     (check-mutt [mutt "bye" #:to "mae@west.it" #:subject "yo" #:cc "a@a.a"]
                 `("-s" "yo" "-c" "a@a.a" "mae@west.it" "bye"))
     (check-mutt [mutt "yes" #:to "felix@cat.ct" #:subject "--" #:cc '("mr@dont.play") #:bcc '("we@pa.com" "www@dotcom.com")]
@@ -45,6 +47,9 @@
     (check-mutt [mutt* (string->path sample_msg) #:to* email_addrs #:subject "fyi"]
                 `("-s" "fyi" "john@doe.com" "we" "trippy" "mane"
                   "-s" "fyi" "jane@doe.gov" "we" "trippy" "mane"))
+    (check-mutt [mutt* (string->path sample_msg) #:to* email_addrs #:subject "fyi" "other" "args too"]
+                `("-s" "fyi" "john@doe.com" "we" "trippy" "mane" "otherargs" "too"
+                  "-s" "fyi" "jane@doe.gov" "we" "trippy" "mane" "otherargs" "too"))
   )
 
   (test-case "in-email*"
