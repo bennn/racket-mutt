@@ -11,9 +11,11 @@
   mutt/private/parameters
   (only-in racket/list append*)
   (only-in racket/file file->lines file->string)
+  (only-in racket/port copy-port)
   racket/sequence
   racket/string
   racket/system
+  (only-in scribble/core content? content->string)
 )
 
 ;; =============================================================================
@@ -25,22 +27,24 @@
               #:subject [subject (*mutt-default-subject*)]
               #:cc [cc (*mutt-default-cc*)]
               #:bcc [bcc (*mutt-default-bcc*)]
-              #:attachment [att* (*mutt-default-attachment*)])
-  (mutt/internal msg to subject (in-email* cc) (in-email* bcc) (in-attach* att*)))
+              #:attachment [att* (*mutt-default-attachment*)]
+              . msg*)
+  (mutt/internal msg msg* to subject (in-email* cc) (in-email* bcc) (in-attach* att*)))
 
 (define (mutt* msg
                #:to* to*
                #:subject [subject (*mutt-default-subject*)]
                #:cc [pre-cc (*mutt-default-cc*)]
                #:bcc [pre-bcc (*mutt-default-bcc*)]
-               #:attachment [pre-att* (*mutt-default-attachment*)])
+               #:attachment [pre-att* (*mutt-default-attachment*)]
+               . msg*)
   (define att* (in-attach* pre-att*))
   (define cc (in-email* pre-cc))
   (define bcc (in-email* pre-bcc))
   (for/and ((to (in-email* to*)))
-    (mutt/internal msg to subject cc bcc att*)))
+    (mutt/internal msg msg* to subject cc bcc att*)))
 
-(define (mutt/internal msg to subject cc bcc att*)
+(define (mutt/internal msg msg* to subject cc bcc att*)
   (define mutt-exe
     (let ([exe (*mutt-exe-path*)])
       (if exe
@@ -54,16 +58,25 @@
                            (format-cc cc)
                            (format-bcc bcc)
                            (format-to+attachments to att*)))
-  (cond
-   [(file-exists? msg)
-    (mutt-send/internal mutt-exe mutt-cmd (path-string->string msg))]
-   [(string? msg)
+  (if (and (path-string? msg) (file-exists? msg) (null? msg*))
+    (mutt-send/internal mutt-exe mutt-cmd (path-string->string msg))
     (with-tmpfile
-      (lambda (ps)
-        (with-output-to-file ps (lambda () (displayln msg)))
-        (mutt-send/internal mutt-exe mutt-cmd (path-string->string ps))))]
-   [else
-    (raise-argument-error 'mutt "(or/c string? file-exists?)" msg)]))
+      (lambda (tmp)
+        (call-with-output-file tmp
+          (lambda (tmp-port)
+            (void ;; write `msg`
+              (cond
+               [(and (path-string? msg) (file-exists? msg))
+                (call-with-input-file msg
+                  (lambda (msg-port)
+                    (copy-port msg-port tmp-port)))]
+               [(content? msg)
+                (displayln (content->string msg) tmp-port)]
+               [else
+                (raise-argument-error 'mutt "(or/c file-exists? content?)" msg)]))
+            (void ;; write `msg*`
+              (displayln (content->string msg*) tmp-port))))
+        (mutt-send/internal mutt-exe mutt-cmd (path-string->string tmp))))))
 
 (define (mutt-send/internal mutt-exe mutt-cmd path-str)
   (define full-command (format "~a < ~a" mutt-cmd path-str))

@@ -1,19 +1,21 @@
 #lang typed/racket/base
 
 (require/typed/provide mutt/private/main
-  [mutt (->* [Path-String
+  [mutt (->* [(U Path-String (Listof String))
               #:to String]
              [#:subject String
               #:cc Pre-Email*
               #:bcc Pre-Email*
               #:attachment (U #f Path-String (Listof Path-String))]
+             #:rest String
              Boolean)]
-  [mutt* (->* [Path-String
+  [mutt* (->* [(U Path-String (Listof String))
                #:to* String]
               [#:subject String
                #:cc Pre-Email*
                #:bcc Pre-Email*
                #:attachment (U #f Path-String (Listof Path-String))]
+              #:rest String
               Boolean)]
   [in-email* (-> Pre-Email* (Listof String))]
   [email? (-> String (U #f String))])
