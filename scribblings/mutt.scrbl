@@ -82,13 +82,13 @@ Alternatively, the @racketmodname[mutt/setup] module provides a hook for reconfi
              (current-output-port (open-output-nowhere)))))
 
 @defproc[(mutt [message (or/c path-string? content?)] ...+
-               [#:to to email?]
+               [#:to to pre-email*/c]
                [#:subject subject string? (*mutt-default-subject*)]
                [#:cc cc pre-email*/c (*mutt-default-cc*)]
                [#:bcc bcc pre-email*/c (*mutt-default-bcc*)]
                [#:attachment attach* attachment/c (*mutt-default-attachment*)])
          boolean?]{
-  Send an email to the address @racket[to] with subject @racket[subject] and message body @racket[message].
+  Send an email to the address(es) @racket[to] with subject @racket[subject] and message body @racket[message].
   If @racket[message] is a filename, the email contains the contents of the file.
   Otherwise, the email contains the string @racket[message].
 
@@ -123,7 +123,9 @@ Alternatively, the @racketmodname[mutt/setup] module provides a hook for reconfi
       How are you feeling today?}
   }|
 
-  @history[#:changed "0.4" @elem{Accept rest-args, for @racketmodname[at-exp] compatibility.}]
+  @history[
+    #:changed "0.5" @elem{Accept tree of @racket[#:to] destination addresses.}
+    #:changed "0.4" @elem{Accept rest-args, for @racketmodname[at-exp] compatibility.}]
 }
 
 @defproc[(mutt* [message (or/c path-string? content?)] ...+
@@ -133,6 +135,9 @@ Alternatively, the @racketmodname[mutt/setup] module provides a hook for reconfi
                 [#:bcc bcc pre-email*/c (*mutt-default-bcc*)]
                 [#:attachment attach* attachment/c (*mutt-default-attachment*)])
          boolean?]{
+
+  @deprecated[#:what "function" @racket[mutt]]
+
   For each recipient address in @racket[to*], send an identical email message and include the same cc's, bcc's, and attachments.
 
   @examples[#:eval mutt-eval

@@ -44,10 +44,10 @@
 
 
   (test-case "mutt*"
-    (check-mutt [mutt* (string->path sample_msg) #:to* email_addrs #:subject "fyi"]
+    (check-mutt [mutt (string->path sample_msg) #:to email_addrs #:subject "fyi"]
                 `("-s" "fyi" "john@doe.com" "we" "trippy" "mane"
                   "-s" "fyi" "jane@doe.gov" "we" "trippy" "mane"))
-    (check-mutt [mutt* (string->path sample_msg) #:to* email_addrs #:subject "fyi" "other" "args too"]
+    (check-mutt [mutt (string->path sample_msg) #:to email_addrs #:subject "fyi" "other" "args too"]
                 `("-s" "fyi" "john@doe.com" "we" "trippy" "mane" "otherargs" "too"
                   "-s" "fyi" "jane@doe.gov" "we" "trippy" "mane" "otherargs" "too"))
   )

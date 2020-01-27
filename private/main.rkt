@@ -23,13 +23,17 @@
 (define-logger mutt)
 
 (define (mutt msg
-              #:to to
+              #:to to*
               #:subject [subject (*mutt-default-subject*)]
-              #:cc [cc (*mutt-default-cc*)]
-              #:bcc [bcc (*mutt-default-bcc*)]
-              #:attachment [att* (*mutt-default-attachment*)]
+              #:cc [pre-cc (*mutt-default-cc*)]
+              #:bcc [pre-bcc (*mutt-default-bcc*)]
+              #:attachment [pre-att* (*mutt-default-attachment*)]
               . msg*)
-  (mutt/internal msg msg* to subject (in-email* cc) (in-email* bcc) (in-attach* att*)))
+  (define att* (in-attach* pre-att*))
+  (define cc (in-email* pre-cc))
+  (define bcc (in-email* pre-bcc))
+  (for/and ((to (in-email* to*)))
+    (mutt/internal msg msg* to subject cc bcc att*)))
 
 (define (mutt* msg
                #:to* to*
@@ -136,7 +140,7 @@
         (printf "[mutt] skipping invalid email address '~a'\n" v)
         (list)))]
    [else
-    (raise-argument-error 'in-email* "(or/c email? file-exists? (listof (or/c email? file-exists?)))" v)]))
+    (raise-argument-error 'in-email* "(treeof (or/c email? file-exists?))" v)]))
 
 (define (format-*cc emails prefix)
   (if (null? emails)

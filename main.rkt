@@ -14,7 +14,7 @@
   (contract-out
    [mutt
     (->* [(or/c path-string? string? pair?)
-          #:to string?]
+          #:to pre-email*/c]
          [#:attachment attachment/c
           #:subject string?
           #:cc pre-email*/c
@@ -67,6 +67,10 @@
 (define pre-email/c
   (or/c string? path-string?))
 
+(define (treeof elem-contract)
+  (or/c elem-contract
+        (listof (recursive-contract (treeof elem-contract) #:flat))))
+
 (define pre-email*/c
-  (or/c pre-email/c (listof pre-email/c)))
+  (treeof pre-email/c))
 
