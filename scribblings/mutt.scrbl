@@ -122,6 +122,8 @@ Alternatively, the @racketmodname[mutt/setup] module provides a hook for reconfi
 
       How are you feeling today?}
   }|
+
+  @history[#:changed "0.4" @elem{Accept rest-args, for @racketmodname[at-exp] compatibility.}]
 }
 
 @defproc[(mutt* [message (or/c path-string? content?)] ...+
