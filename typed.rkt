@@ -2,7 +2,7 @@
 
 (require/typed/provide mutt/private/main
   [mutt (->* [(U Path-String (Listof String))
-              #:to String]
+              #:to Pre-Email*]
              [#:subject String
               #:cc Pre-Email*
               #:bcc Pre-Email*
@@ -10,7 +10,7 @@
              #:rest String
              Boolean)]
   [mutt* (->* [(U Path-String (Listof String))
-               #:to* String]
+               #:to* Pre-Email*]
               [#:subject String
                #:cc Pre-Email*
                #:bcc Pre-Email*

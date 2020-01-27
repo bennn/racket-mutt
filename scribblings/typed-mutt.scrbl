@@ -12,14 +12,14 @@ Typed clients should import the @racketmodname[mutt/typed] module.
 
 @deftogether[(
  @defthing[mutt (->* [Path-String
-                      #:to String]
+                      #:to Pre-Email*]
                      [#:subject String
                       #:cc Pre-Email*
                       #:bcc Pre-Email*
                       #:attachment (U #f Path-String (Listof Path-String))]
                      Boolean)]
  @defthing[mutt* (->* [Path-String
-                       #:to String]
+                       #:to Pre-Email*]
                       [#:subject String
                        #:cc Pre-Email*
                        #:bcc Pre-Email*
