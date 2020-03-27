@@ -50,11 +50,11 @@ API
   Similar to `mutt`, but send the same message to a list of recipients.
   Accepts the same options too, except for `#:to`.
 
-See the documentation for more: <http://docs.racket-lang.org/racket-mutt/index.html>
+See the documentation for more: <http://docs.racket-lang.org/mutt/index.html>
 
 
 FAQ
----
+--- 
 
 #### Q. Can I accept certificates on the command line?
 
