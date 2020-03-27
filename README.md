@@ -54,7 +54,7 @@ See the documentation for more: <http://docs.racket-lang.org/mutt/index.html>
 
 
 FAQ
---- 
+---
 
 #### Q. Can I accept certificates on the command line?
 
