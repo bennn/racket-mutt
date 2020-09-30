@@ -88,7 +88,7 @@ Alternatively, the @racketmodname[mutt/setup] module provides a hook for reconfi
                [#:bcc bcc pre-email*/c (*mutt-default-bcc*)]
                [#:attachment attach* attachment/c (*mutt-default-attachment*)])
          boolean?]{
-  Send an email to the address(es) @racket[to] with subject @racket[subject] and message body @racket[message].
+  Send email(s) to the address(es) @racket[to] with subject @racket[subject] and message body @racket[message].
   If @racket[message] is a filename, the email contains the contents of the file.
   Otherwise, the email contains the string @racket[message].
 
