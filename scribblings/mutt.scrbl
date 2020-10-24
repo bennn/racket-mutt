@@ -86,7 +86,8 @@ Alternatively, the @racketmodname[mutt/setup] module provides a hook for reconfi
                [#:subject subject string? (*mutt-default-subject*)]
                [#:cc cc pre-email*/c (*mutt-default-cc*)]
                [#:bcc bcc pre-email*/c (*mutt-default-bcc*)]
-               [#:attachment attach* attachment/c (*mutt-default-attachment*)])
+               [#:attachment attach* attachment/c (*mutt-default-attachment*)]
+               [#:reply-to reply-to (or/c #f string?) (*mutt-default-reply-to*)])
          boolean?]{
   Send email(s) to the address(es) @racket[to] with subject @racket[subject] and message body @racket[message].
   If @racket[message] is a filename, the email contains the contents of the file.
@@ -95,6 +96,7 @@ Alternatively, the @racketmodname[mutt/setup] module provides a hook for reconfi
   Send carbon copies to the @racket[cc] addresses; these are public recipients of the same message.
   Send blind carbon copies to the @racket[bcc] addresses; the @racket[to] address will not see the identity of @racket[bcc]s.
   Attach the files in the list @racket[attach*].
+  If @racket[reply-to] is an email address, set it as the default Reply-To address.
 
   @examples[#:eval mutt-eval
     (mutt "sry"
@@ -124,6 +126,7 @@ Alternatively, the @racketmodname[mutt/setup] module provides a hook for reconfi
   }|
 
   @history[
+    #:changed "0.6" @elem{Added @racket[#:reply-to].}
     #:changed "0.5" @elem{Accept tree of @racket[#:to] destination addresses.}
     #:changed "0.4" @elem{Accept rest-args, for @racketmodname[at-exp] compatibility.}]
 }
@@ -204,6 +207,10 @@ Alternatively, the @racketmodname[mutt/setup] module provides a hook for reconfi
 
 @defparam[*mutt-default-attachment* files (listof path-string?) #:value '()]{
   List of files to attach by default.
+}
+
+@defparam[*mutt-default-reply-to* reply-to (or/c #f string?) #:value #f]{
+  Default Reply-To address.
 }
 
 @defparam[*mutt-exe-path* path (or/c #f path-string?) #:value (find-executable-path "mutt")]{

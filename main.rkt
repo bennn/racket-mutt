@@ -17,6 +17,7 @@
           #:to pre-email*/c]
          [#:attachment attachment/c
           #:subject string?
+          #:reply-to (or/c #f string?)
           #:cc pre-email*/c
           #:bcc pre-email*/c]
          #:rest content?
@@ -46,6 +47,9 @@
 
    [*mutt-default-attachment*
     (parameter/c (listof path-string?))]
+
+   [*mutt-default-reply-to*
+    (parameter/c (or/c #f string?))]
 
    [*mutt-exe-path*
     (parameter/c (or/c #f path-string?))]

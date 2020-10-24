@@ -6,7 +6,8 @@
              [#:subject String
               #:cc Pre-Email*
               #:bcc Pre-Email*
-              #:attachment (U #f Path-String (Listof Path-String))]
+              #:attachment (U #f Path-String (Listof Path-String))
+              #:reply-to (U #f String)]
              #:rest String
              Boolean)]
   [mutt* (->* [(U Path-String (Listof String))
@@ -25,6 +26,7 @@
   [*mutt-default-attachment* (Parameterof (Listof Path-String))]
   [*mutt-default-cc* (Parameterof (Listof String))]
   [*mutt-default-bcc* (Parameterof (Listof String))]
+  [*mutt-default-reply-to* (Parameterof (U #f String))]
   [*mutt-exe-path* (Parameterof (U #f Path-String))])
 
 (provide

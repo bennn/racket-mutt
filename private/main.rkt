@@ -28,12 +28,13 @@
               #:cc [pre-cc (*mutt-default-cc*)]
               #:bcc [pre-bcc (*mutt-default-bcc*)]
               #:attachment [pre-att* (*mutt-default-attachment*)]
+              #:reply-to [reply-to (*mutt-default-reply-to*)]
               . msg*)
   (define att* (in-attach* pre-att*))
   (define cc (in-email* pre-cc))
   (define bcc (in-email* pre-bcc))
   (for/and ((to (in-email* to*)))
-    (mutt/internal msg msg* to subject cc bcc att*)))
+    (mutt/internal msg msg* to subject cc bcc att* reply-to)))
 
 (define (mutt* msg
                #:to* to*
@@ -46,9 +47,9 @@
   (define cc (in-email* pre-cc))
   (define bcc (in-email* pre-bcc))
   (for/and ((to (in-email* to*)))
-    (mutt/internal msg msg* to subject cc bcc att*)))
+    (mutt/internal msg msg* to subject cc bcc att* #f)))
 
-(define (mutt/internal msg msg* to subject cc bcc att*)
+(define (mutt/internal msg msg* to subject cc bcc att* pre-reply-to)
   (define mutt-exe
     (let ([exe (*mutt-exe-path*)])
       (if exe
@@ -56,7 +57,16 @@
         (begin
           (log-mutt-warning "cannot send mail because parameter `*mutt-exe-path*` is `#f`")
           #f))))
-  (define mutt-cmd (format "~a -s ~s ~a ~a ~a"
+  (define reply-to
+    (if (string? pre-reply-to)
+      (if (email? pre-reply-to)
+        pre-reply-to
+        (begin
+          (printf "[mutt] skipping invalid reply-to address '~a'\n" pre-reply-to)
+          #f))
+      #f))
+  (define mutt-cmd (format "~a~a -s ~s ~a ~a ~a"
+                           (if reply-to (format "REPLYTO=~s " reply-to) "")
                            (or mutt-exe '<mutt-exe>)
                            subject
                            (format-cc cc)
