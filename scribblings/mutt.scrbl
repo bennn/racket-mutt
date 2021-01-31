@@ -113,8 +113,8 @@ Alternatively, the @racketmodname[mutt/setup] module provides a hook for reconfi
 
   @codeblock[#:keep-lang-line? #true]|{
     #lang at-exp racket/base
-    (require mutt racket/port)
-    (*mutt-exe-path* "xargs echo ")
+    (require mutt)
+    ;(*mutt-exe-path* "xargs echo ") ;; uncomment for a dry run
 
     (define name "Lizzo")
 
