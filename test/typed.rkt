@@ -30,7 +30,7 @@
     (check-mutt [mutt sample_msg #:to "arthur@frayn.zo" #:cc email_addrs #:bcc (list (string->path email_addrs))]
                 '("-s" "<no-subject>" "-c" "john@doe.com" "-c" "jane@doe.gov" "-b" "john@doe.com" "-b" "jane@doe.gov" "arthur@frayn.zo" "we" "trippy" "mane"))
     (check-mutt [mutt "hello" #:to "adam@west.co" #:subject "hi" "and" " more"]
-                '("-s" "hi" "adam@west.co" "hello" "and" "more"))
+                '("-s" "hi" "adam@west.co" "helloand" "more"))
 
     (let-values (((x log#) (mutt-interceptor
                              (lambda ()

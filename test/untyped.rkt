@@ -24,7 +24,7 @@
     (check-mutt [mutt "hello" #:to "adam@west.co" #:subject "hi"]
                 `("-s" "hi" "adam@west.co" "hello"))
     (check-mutt [mutt "hello" #:to "adam@west.co" #:subject "hi" "and" '("mo" ("re"))]
-                `("-s" "hi" "adam@west.co" "hello" "andmore"))
+                `("-s" "hi" "adam@west.co" "helloandmore"))
     (check-mutt [mutt "bye" #:to "mae@west.it" #:subject "yo" #:cc "a@a.a"]
                 `("-s" "yo" "-c" "a@a.a" "mae@west.it" "bye"))
     (check-mutt [mutt "yes" #:to "felix@cat.ct" #:subject "--" #:cc '("mr@dont.play") #:bcc '("we@pa.com" "www@dotcom.com")]

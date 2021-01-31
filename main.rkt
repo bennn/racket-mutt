@@ -10,6 +10,9 @@
 
 ;; -----------------------------------------------------------------------------
 
+(define rest?
+  (or/c path-string? (listof path-string?) content?))
+
 (provide
   (contract-out
    [mutt
@@ -20,7 +23,7 @@
           #:reply-to (or/c #f string?)
           #:cc pre-email*/c
           #:bcc pre-email*/c]
-         #:rest content?
+         #:rest rest?
          boolean?)]
 
    [mutt*
@@ -30,7 +33,7 @@
           #:subject string?
           #:cc pre-email*/c
           #:bcc pre-email*/c]
-         #:rest content?
+         #:rest rest?
          boolean?)]
 
    [in-email*
