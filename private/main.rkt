@@ -164,7 +164,7 @@
 (define (format-to+attachments pre-to att*)
   (define to-str (format "'~a'" pre-to))
   (if att*
-    (string-append (format-*cc att* "-a") " -- " to-str)
+    (string-append (format-*cc (map path-string->string att*) "-a") " -- " to-str)
     to-str))
 
 (define (path-string->string x)
@@ -240,7 +240,9 @@
      ["sam@sam.gov" #f
       ==> "'sam@sam.gov'"]
      ["dave@republic.io" '("free.jpg")
-      ==> "-a free.jpg -- 'dave@republic.io'"])
+      ==> "-a free.jpg -- 'dave@republic.io'"]
+     ["test@example.com" (list (build-path "./test"))
+      ==> "-a ./test -- 'test@example.com'"])
   )
 
   (test-case "path-string->string"
