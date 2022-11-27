@@ -239,3 +239,14 @@ Alternatively, the @racketmodname[mutt/setup] module provides a hook for reconfi
 
 No. Run @exec{mutt} on the command line to manually approve certificates.
 (Make sure to "always accept" the certificate.)
+
+@bold{Q. Google gmail stopped allowing less-secure apps in May 2022.
+What to do?}
+
+Try OAuth2:
+@url{https://shallowsky.com/blog/tech/email/gmail-api-oauth2.html}
+
+or IMAP:
+@url{https://domm.plix.at/perl/2022_05_use_multiple_gmail_accounts_via_mutt_and_offlineimap.html}
+
+
