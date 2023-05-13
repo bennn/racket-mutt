@@ -87,7 +87,7 @@ Alternatively, the @racketmodname[mutt/setup] module provides a hook for reconfi
                [#:cc cc pre-email*/c (*mutt-default-cc*)]
                [#:bcc bcc pre-email*/c (*mutt-default-bcc*)]
                [#:attachment attach* attachment/c (*mutt-default-attachment*)]
-               [#:reply-to reply-to (or/c #f string?) (*mutt-default-reply-to*)])
+               [#:reply-to reply-to (or/c #f pre-email*/c) (*mutt-default-reply-to*)])
          boolean?]{
   Send email(s) to the address(es) @racket[to] with subject @racket[subject] and message body @racket[message].
   If @racket[message] is a filename, the email contains the contents of the file.
@@ -96,7 +96,7 @@ Alternatively, the @racketmodname[mutt/setup] module provides a hook for reconfi
   Send carbon copies to the @racket[cc] addresses; these are public recipients of the same message.
   Send blind carbon copies to the @racket[bcc] addresses; the @racket[to] address will not see the identity of @racket[bcc]s.
   Attach the files in the list @racket[attach*].
-  If @racket[reply-to] is an email address, set it as the default Reply-To address.
+  Set the @racket[reply-to] address(es), as the default Reply-To target.
 
   @examples[#:eval mutt-eval
     (mutt "sry"
@@ -126,6 +126,7 @@ Alternatively, the @racketmodname[mutt/setup] module provides a hook for reconfi
   }|
 
   @history[
+    #:changed "0.8" @elem{Allow multiple @racket[#:reply-to] addresses.}
     #:changed "0.6" @elem{Added @racket[#:reply-to].}
     #:changed "0.5" @elem{Accept tree of @racket[#:to] destination addresses.}
     #:changed "0.4" @elem{Accept rest-args, for @racketmodname[at-exp] compatibility.}]

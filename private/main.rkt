@@ -28,11 +28,12 @@
               #:cc [pre-cc (*mutt-default-cc*)]
               #:bcc [pre-bcc (*mutt-default-bcc*)]
               #:attachment [pre-att* (*mutt-default-attachment*)]
-              #:reply-to [reply-to (*mutt-default-reply-to*)]
+              #:reply-to [pre-reply-to (*mutt-default-reply-to*)]
               . msg*)
   (define att* (in-attach* pre-att*))
   (define cc (in-email* pre-cc))
   (define bcc (in-email* pre-bcc))
+  (define reply-to (in-email* pre-reply-to))
   (for/and ((to (in-email* to*)))
     (mutt/internal msg msg* to subject cc bcc att* reply-to)))
 
@@ -57,14 +58,7 @@
         (begin
           (log-mutt-warning "cannot send mail because parameter `*mutt-exe-path*` is `#f`")
           #f))))
-  (define reply-to
-    (if (string? pre-reply-to)
-      (if (email? pre-reply-to)
-        pre-reply-to
-        (begin
-          (printf "[mutt] skipping invalid reply-to address '~a'\n" pre-reply-to)
-          #f))
-      #f))
+  (define reply-to (format-email-list pre-reply-to))
   (define mutt-cmd (format "~a~a -s ~s ~a ~a ~a"
                            (if reply-to (format "REPLYTO=~s " reply-to) "")
                            (or mutt-exe '<mutt-exe>)
@@ -160,6 +154,20 @@
 
 (define (format-bcc emails)
   (format-*cc emails "-b"))
+
+(define (format-email-list ee*)
+  (string-join
+    (filter values (map string->email ee*))
+    ","))
+
+(define (string->email ee)
+  (if (string? ee)
+    (if (email? ee)
+      ee
+      (begin
+        (printf "[mutt] skipping invalid reply-to address '~a'\n" ee)
+        #f))
+    #f))
 
 (define (format-to+attachments pre-to att*)
   (define to-str (format "'~a'" pre-to))

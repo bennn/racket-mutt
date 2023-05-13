@@ -20,7 +20,7 @@
           #:to pre-email*/c]
          [#:attachment attachment/c
           #:subject string?
-          #:reply-to (or/c #f string?)
+          #:reply-to (or/c #f pre-email*/c)
           #:cc pre-email*/c
           #:bcc pre-email*/c]
          #:rest rest?
