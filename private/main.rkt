@@ -33,7 +33,7 @@
   (define att* (in-attach* pre-att*))
   (define cc (in-email* pre-cc))
   (define bcc (in-email* pre-bcc))
-  (define reply-to (in-email* pre-reply-to))
+  (define reply-to (and pre-reply-to (in-email* pre-reply-to)))
   (for/and ((to (in-email* to*)))
     (mutt/internal msg msg* to subject cc bcc att* reply-to)))
 
@@ -58,7 +58,7 @@
         (begin
           (log-mutt-warning "cannot send mail because parameter `*mutt-exe-path*` is `#f`")
           #f))))
-  (define reply-to (format-email-list pre-reply-to))
+  (define reply-to (and pre-reply-to (format-email-list pre-reply-to)))
   (define mutt-cmd (format "~a~a -s ~s ~a ~a ~a"
                            (if reply-to (format "REPLYTO=~s " reply-to) "")
                            (or mutt-exe '<mutt-exe>)
